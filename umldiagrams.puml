@@ -1,0 +1,94 @@
+@startuml "Chonka"
+class Character {
+  + Character(const std::string& name, int level)
+  + virtual ~Character() = default
+  + virtual void attack(Character& target) = 0
+  + virtual void useAbility() = 0
+  + virtual void useSpecial()
+  + virtual void protectAlly(Character& ally, int incomingDamage)
+  + virtual void takeDamage(int damage)
+  + virtual void printInfo() const
+  + void heal(int amount)
+  + void update(float deltaSeconds)
+  + std::string getName() const
+  + int getHealth() const
+  + int getLevel() const
+  + int getMaxHealth() const
+  + int getBaseDamage() const
+  + void setHealth(int h)
+  --
+  # std::string name
+  # int level
+  # int health
+  # int maxHealth
+  # int baseDamage
+  # int regenAmount
+  # float regenIntervalSec
+  # float regenAccumulator
+  # void setBaseDamage(int dmg)
+  # virtual void onUpdate(float deltaSeconds)
+}
+
+class MeleeCharacter extends Character {
+  + MeleeCharacter(const std::string& name, int level, int str, int agi)
+  + void showStats() const
+  + int calculateDamage() const
+  --
+  # int strength
+  # int agility
+}
+
+class Templar extends MeleeCharacter {
+  - int faith;
+  - int blockChance;
+  - int armor;
+  - int holyPower;
+  - bool isImmobilized;
+  - int aegisTicksRemaining;
+  - int aegisHealAmount;
+  - int currentAegisHeal;
+  --
+  + Templar(const std::string& name, int level, int startFaith);
+  + Templar(const std::string& name, int level);
+  + explicit Templar(const std::string& name);
+  + void activateDivineAegis();
+  + void deactivateDivineAegis();
+  + void takeHitForAlly(Character& ally, int incomingDamage);
+  + int getfaith() const { return faith; }
+  + void attack(Character& target) override;
+  + void useAbility() override;
+  + void useSpecial() override;
+  + void takeDamage(int damage) override;
+  + void protectAlly(Character& ally, int incomingDamage) override;
+  + void printInfo() const override;
+  --
+  # void onUpdate(float deltaSeconds) override;
+}
+
+class Seeker extends MeleeCharacter {
+  - int energy;
+  - int dodgeChance;
+  - bool isStealthed;
+  - float stealthSeconds;
+  --
+  + Seeker(const std::string& name, int level, int startEnergy);
+  + Seeker(const std::string& name, int level);
+  + explicit Seeker(const std::string& name);
+  + void attack(Character& target) override;
+  + void useAbility() override;
+  + void takeDamage(int damage) override;
+  + void useSpecial() override;
+  + void printInfo() const override;
+  + void enterStealth();
+  + bool tryDodge() const;
+  + void showSeekerStats() const;
+  + int getEnergy() const;
+  + int getDodgeChance() const;
+  + bool getStealthState() const;
+  + void setEnergy(int e);
+  --
+  # void onUpdate(float deltaSeconds) override;
+}
+@enduml
+
+
