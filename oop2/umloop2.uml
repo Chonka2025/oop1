@@ -1,0 +1,211 @@
+<!-- <?xml version="1.0" encoding="UTF-8"?>
+<uml xmlns="http://www.plantuml.com/2020/1"> -->
+@startuml п
+
+
+namespace CharacterBattle {
+
+  abstract class Character {
+    - _id: int
+    - _name: string
+    - _level: int
+    - _health: int
+    - _maxHealth: int
+    - _baseDamage: int
+    - _regenAmount: int
+    - _regenIntervalSec: float
+    - _regenAccumulator: float
+    + Id: int { get; set; }
+    + Name: string { get; set; }
+    + Level: int { get; set; }
+    + Health: int { get; set; }
+    + MaxHealth: int { get; set; }
+    + BaseDamage: int { get; protected internal set; }
+    + RegenAmount: int { get; set; }
+    + RegenIntervalSec: float { get; set; }
+    + RegenAccumulator: float { get; set; }
+    # Character(name: string, level: int)
+    + Attack(target: Character): void { abstract }
+    + UseAbility(): void { abstract }
+    + UseSpecial(): void <<virtual>>
+    + ProtectAlly(ally: Character, incomingDamage: int): void <<virtual>>
+    + TakeDamage(damage: int): void <<virtual>>
+    + PrintInfo(): string <<virtual>>
+    + Heal(amount: int): void
+    + Update(deltaSeconds: float): void
+    # OnUpdate(deltaSeconds: float): void <<virtual>>
+    + GetCharacterType(): string { abstract }
+  }
+
+  abstract class MeleeCharacter {
+    - _strength: int
+    - _agility: int
+    + Strength: int { get; set; }
+    + Agility: int { get; set; }
+    # MeleeCharacter(name: string, level: int, strength: int, agility: int)
+    + CalculateDamage(): int
+    + ShowStats(): string
+    + GetStats(): string
+  }
+
+  class Seeker {
+    - _energy: int
+    - _dodgeChance: int
+    - _isStealthed: bool
+    - _stealthSeconds: float
+    - _repository: ICharacterRepository?
+    + Energy: int { get; set; }
+    + DodgeChance: int { get; set; }
+    + IsStealthed: bool { get; set; }
+    + StealthSeconds: float { get; set; }
+    + MaxEffectiveDodgePercent: int <<const>>
+    + Seeker(name: string, level: int, startEnergy: int, repository: ICharacterRepository?)
+    + Seeker(name: string, level: int, repository: ICharacterRepository?)
+    + Seeker(name: string, repository: ICharacterRepository?)
+    + SetRepository(repository: ICharacterRepository?): void
+    + Attack(target: Character): void
+    + UseAbility(): void
+    + TakeDamage(damage: int): void
+    + UseSpecial(): void
+    + EnterStealth(): void
+    + TryDodge(out roll: int, out effectiveThreshold: int): bool
+    + GetSeekerStats(): string
+    + DefaultStats(): void
+    + OnUpdate(deltaSeconds: float): void
+    + PrintInfo(): string
+    + GetCharacterType(): string
+    + GetStats(): string
+  }
+
+  class Templar {
+    - _faith: int
+    - _blockChance: int
+    - _armor: int
+    - _holyPower: int
+    - _isImmobilized: bool
+    - _aegisTicksRemaining: int
+    - _aegisHealAmount: int
+    - _currentAegisHeal: int
+    + Faith: int { get; set; }
+    + BlockChance: int { get; set; }
+    + Armor: int { get; set; }
+    + HolyPower: int { get; set; }
+    + IsImmobilized: bool { get; set; }
+    + AegisTicksRemaining: int <<readonly>>
+    + AegisHealAmount: int <<readonly>>
+    + SetAegisState(ticksRemaining: int, healAmount: int): void
+    + Templar(name: string, level: int, startFaith: int)
+    + Templar(name: string, level: int)
+    + Templar(name: string)
+    + Attack(target: Character): void
+    + UseAbility(): void
+    + TakeDamage(damage: int): void
+    + ProtectAlly(ally: Character, incomingDamage: int): void
+    + UseSpecial(): void
+    + ActivateDivineAegis(): void
+    + DeactivateDivineAegis(): void
+    + TakeHitForAlly(ally: Character, incomingDamage: int): void
+    + GetTemplarStats(): string
+    + DefaultStats(): void
+    + OnUpdate(deltaSeconds: float): void
+    + PrintInfo(): string
+    + GetCharacterType(): string
+    + GetStats(): string
+  }
+
+  interface ICharacterRepository {
+    + GetAll(): List<Character>
+    + GetById(id: int): Character?
+    + Add(character: Character): void
+    + Update(character: Character): void
+    + Delete(id: int): void
+    + GetAllSeekers(): List<Seeker>
+    + GetAllTemplars(): List<Templar>
+  }
+
+  class CharacterRepository {
+    - _connectionString: string
+    + CharacterRepository(connectionString: string)
+    + GetAll(): List<Character>
+    + GetById(id: int): Character?
+    + Add(character: Character): void
+    + Update(character: Character): void
+    + Delete(id: int): void
+    + GetAllSeekers(): List<Seeker>
+    + GetAllTemplars(): List<Templar>
+    - MapSeeker(reader: NpgsqlDataReader, id: int): Seeker
+    - MapTemplar(reader: NpgsqlDataReader, id: int): Templar
+  }
+
+  static class BattleNarrator {
+    - _sink: Action<string>?
+    + SetSink(appendLine: Action<string>?): void
+    + Line(message: string): void
+  }
+
+  class FormCharacter {
+    - _repository: ICharacterRepository
+    - _character: Character?
+    - _isEditMode: bool
+    + Character: Character
+    + FormCharacter(repository: ICharacterRepository, character: Character?)
+    - InitializeComponent(): void
+    - BuildCreateUi(): void
+    - BuildEditUi(): void
+    - BtnResetDefaults_Click(): void
+    - RefreshFromCharacter(): void
+    - UpdateMeleeStatsLabel(): void
+    - UpdateLevelDerivedPreview(): void
+    - LoadCharacterData(): void
+    - BtnSave_Click(): void
+    - SaveCreate(): void
+    - SaveEdit(): void
+  }
+
+  class FormMain {
+    - _repository: ICharacterRepository?
+    - dgvCharacters: DataGridView
+    - panelControls: Panel
+    - btnAdd: Button
+    - btnEdit: Button
+    - btnDelete: Button
+    - btnRefresh: Button
+    - btnHeal: Button
+    - btnVizov: Button
+    - txtInfo: TextBox
+    - lblTitle: Label
+    - lblStatus: Label
+    - _isConnected: bool
+    + DefaultConnectionString: string <<static>> <<get; set;>>
+    + FormMain()
+    - ConnectToDatabase(): void
+    - InitializeComponent(): void
+    - LoadCharacters(): void
+    - BtnAdd_Click(sender: object?, e: EventArgs): void
+    - BtnEdit_Click(sender: object?, e: EventArgs): void
+    - BtnDelete_Click(sender: object?, e: EventArgs): void
+    - BtnRefresh_Click(sender: object?, e: EventArgs): void
+    - BtnHeal_Click(sender: object?, e: EventArgs): void
+    - BtnVizov_Click(sender: object?, e: EventArgs): void
+    - ShowMethodPickerDialog(character: Character): void
+    - SelectedMethod(character: Character, methodKey: string): void
+    - DemonstrateSeeker(seeker: Seeker): void
+    - DemonstrateTemplar(templar: Templar): void
+  }
+
+  Character <|-- MeleeCharacter : <<abstract>>
+  MeleeCharacter <|-- Seeker : <<abstract>>
+  MeleeCharacter <|-- Templar : <<abstract>>
+
+  CharacterRepository ..|> ICharacterRepository : <<implements>>
+
+  Seeker --> ICharacterRepository : <<uses>>
+  FormMain ..> ICharacterRepository : <<depends>>
+  FormMain ..> Character : <<creates>>
+  FormMain ..> Seeker : <<creates>>
+  FormMain ..> Templar : <<creates>>
+  FormCharacter ..> ICharacterRepository : <<uses>>
+  FormCharacter ..> Character : <<creates>>
+
+}
+@enduml
