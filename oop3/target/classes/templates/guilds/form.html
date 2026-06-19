@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${guild != null} ? 'Редактирование гильдии' : 'Новая гильдия'">Гильдия</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1 th:text="${guild != null} ? 'Редактирование гильдии' : 'Создание гильдии'"></h1>
+        </div>
+        <div class="actions">
+            <a class="button secondary" th:href="@{/guilds}">Назад к списку</a>
+        </div>
+    </div>
+
+    <form th:action="${guild != null} ? @{|/guilds/${guild.id}/edit|} : @{/guilds}" method="post" class="form-card">
+        <div class="grid two-columns">
+            <label>
+                Название
+                <input type="text" name="name" th:value="${guild?.name}" required>
+            </label>
+            <label>
+                Описание
+                <textarea name="description" th:text="${guild?.description}"></textarea>
+            </label>
+        </div>
+        <div class="actions">
+            <button class="button" type="submit">Сохранить</button>
+            <a class="button secondary" th:href="@{/guilds}">Отмена</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>
+

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${guild.name}">Гильдия</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1 th:text="${guild.name}"></h1>
+            <p th:text="${guild.description}"></p>
+        </div>
+        <div class="actions">
+            <a class="button" th:href="@{|/guilds/${guild.id}/edit|}">Изменить</a>
+            <a class="button secondary" th:href="@{/guilds}">К списку гильдий</a>
+        </div>
+    </div>
+
+    <div class="details-grid">
+        <section class="card">
+            <h2>Участники (<span th:text="${#sets.size(guild.members)}"></span>)</h2>
+            <div th:if="${#sets.isEmpty(guild.members)}" class="empty-state">
+                В гильдии пока нет участников.
+            </div>
+            <table th:if="${!#sets.isEmpty(guild.members)}">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Имя</th>
+                    <th>Класс</th>
+                    <th>Уровень</th>
+                    <th>HP</th>
+                    <th>Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="member : ${guild.members}">
+                    <td th:text="${member.id}"></td>
+                    <td th:text="${member.name}"></td>
+                    <td th:text="${member.characterClass}"></td>
+                    <td th:text="${member.level}"></td>
+                    <td th:text ="${member.maxHealth}"></td>
+                    <td class="row-actions">
+                        <a th:href="@{|/characters/${member.id}|}">Открыть</a>
+                        <form th:action="@{|/guilds/${guild.id}/removeMember|}" method="post">
+                            <input type="hidden" name="characterId" th:value="${member.id}">
+                            <button class="link-button danger" type="submit">Исключить</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="card">
+            <h2>Добавить участника</h2>
+            <div th:if="${error != null}" class="error-message" th:text="${error}"></div>
+            <form th:action="@{|/guilds/${guild.id}/addMember|}" method="post" class="inline-form">
+                <label>
+                    Имя персонажа
+                    <input type="text" name="name" required>
+                </label>
+                <button type="submit">Добавить</button>
+            </form>
+        </section>
+    </div>
+</div>
+</body>
+</html>
+<!-- guild.members — это коллекция, которую Hibernate наполнил при вызове guildService.findById(id), отобрав только тех
+персонажей, у кого guild_id = id этой гильдии. -->

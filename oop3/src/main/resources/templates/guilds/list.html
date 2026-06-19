@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Гильдии</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1>Гильдии</h1>
+        </div>
+        <div class="actions">
+            <a class="button" th:href="@{/guilds/new}">Создать гильдию</a>
+            <a class="button secondary" th:href="@{/characters}">К персонажам</a>
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(guilds)}" class="empty-state">
+        Гильдий пока нет.
+    </div>
+
+    <table th:if="${!#lists.isEmpty(guilds)}">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Участников</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="guild : ${guilds}">
+            <td th:text="${guild.id}"></td>
+            <td th:text="${guild.name}"></td>
+            <td th:text="${#sets.size(guild.members)}"></td>
+            <td class="row-actions">
+                <a th:href="@{|/guilds/${guild.id}|}">Открыть</a>
+                <a th:href="@{|/guilds/${guild.id}/edit|}">Изменить</a>
+                <form th:action="@{|/guilds/${guild.id}/delete|}" method="post">
+                    <button class="link-button danger" type="submit">Удалить</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!-- Форма создания и редактирования -->
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${editMode} ? 'Редактирование персонажа' : 'Новый персонаж'">Персонаж</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1 th:text="${editMode} ? 'Редактирование персонажа' : 'Создание персонажа'"></h1>
+            <p>Заполнить общие параметры и характеристики нужного класса.</p>
+        </div>
+        <div class="actions">
+            <a class="button secondary" th:href="@{/characters}">Назад к списку</a>
+        </div>
+    </div>
+
+    <form th:action="@{/characters}" th:object="${form}" method="post" class="form-card">
+        <input type="hidden" th:field="*{id}">
+
+        <div class="grid two-columns">
+            <label>
+                Тип персонажа
+                <select th:field="*{type}" id="characterType" th:disabled="${editMode}">
+                    <option value="SEEKER">Seeker</option>
+                    <option value="TEMPLAR">Templar</option>
+                </select>
+            </label>
+
+            <input type="hidden" th:if="${editMode}" th:field="*{type}">
+
+            <label>
+                Имя
+                <input th:field="*{name}" required>
+            </label>
+
+            <label>
+                Уровень
+                <input th:field="*{level}" type="number" min="1" required>
+            </label>
+
+            <label>
+                Здоровье
+                <input th:field="*{health}" type="number" min="0" required>
+            </label>
+
+            <label>
+                Макс. здоровье
+                <input th:field="*{maxHealth}" type="number" min="1" required>
+            </label>
+
+            <label>
+                Базовый урон
+                <input th:field="*{baseDamage}" type="number" min="1" required>
+            </label>
+
+            <label>
+                Регенерация
+                <input th:field="*{regenAmount}" type="number" min="0" required>
+            </label>
+
+            <label>
+                Интервал регена (сек)
+                <input th:field="*{regenIntervalSec}" type="number" min="0" step="0.1" required>
+            </label>
+
+            <label>
+                Сила
+                <input th:field="*{strength}" type="number" min="5" required>
+            </label>
+
+            <label>
+                Ловкость
+                <input th:field="*{agility}" type="number" min="1" required>
+            </label>
+
+            <label>
+                Гильдия
+                <select th:field="*{guildId}">
+                    <option th:value="null">Нет гильдии</option>
+                    <option th:each="g : ${allGuilds}" th:value="${g.id}" th:text="${g.name}"></option>
+                </select>
+            </label>
+        </div>
+
+        <div id="seekerFields" class="subtype-section">
+            <h2>Поля Seeker</h2>
+            <div class="grid two-columns">
+                <label>
+                    Энергия
+                    <input th:field="*{energy}" type="number" min="0">
+                </label>
+
+                <label>
+                    Шанс уворота
+                    <input th:field="*{dodgeChance}" type="number" min="0">
+                </label>
+
+                <label>
+                    В скрытности
+                    <select th:field="*{isStealthed}">
+                        <option th:value="false">Нет</option>
+                        <option th:value="true">Да</option>
+                    </select>
+                </label>
+
+                <label>
+                    Время скрытности
+                    <input th:field="*{stealthSeconds}" type="number" min="0.0" step="0.1">
+                </label>
+            </div>
+        </div>
+
+        <div id="templarFields" class="subtype-section">
+            <h2>Поля Templar</h2>
+            <div class="grid two-columns">
+                <label>
+                    Вера
+                    <input th:field="*{faith}" type="number" min="0">
+                </label>
+
+                <label>
+                    Шанс блока
+                    <input th:field="*{blockChance}" type="number" min="0">
+                </label>
+
+                <label>
+                    Броня
+                    <input th:field="*{armor}" type="number" min="0">
+                </label>
+
+                <label>
+                    Holy power
+                    <input th:field="*{holyPower}" type="number" min="0">
+                </label>
+
+                <label>
+                    Обездвижен
+                    <select th:field="*{isImmobilized}">
+                        <option th:value="false">Нет</option>
+                        <option th:value="true">Да</option>
+                    </select>
+                </label>
+
+                <label>
+                    Тики Aegis
+                    <input th:field="*{aegisTicksRemaining}" type="number" min="0">
+                </label>
+
+                <label>
+                    Лечение Aegis
+                    <input th:field="*{aegisHealAmount}" type="number" min="0">
+                </label>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="button" type="submit">Сохранить</button>
+            <a class="button secondary" th:href="@{/characters}">Отмена</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    const typeSelect = document.getElementById('characterType');
+    const seekerFields = document.getElementById('seekerFields');
+    const templarFields = document.getElementById('templarFields');
+
+    function toggleSubtypeFields() {
+        const typeValue = typeSelect ? typeSelect.value : document.querySelector('input[name="type"]').value;
+        seekerFields.style.display = typeValue === 'SEEKER' ? 'block' : 'none';
+        templarFields.style.display = typeValue === 'TEMPLAR' ? 'block' : 'none';
+    }
+
+    if (typeSelect) {
+        typeSelect.addEventListener('change', toggleSubtypeFields);
+    }
+    toggleSubtypeFields();
+</script>
+</body>
+</html>

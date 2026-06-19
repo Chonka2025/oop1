@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<!-- Карточка персонажа с кнопками -->
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Карточка персонажа</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="container">
+    <div class="page-header">
+        <div>
+            <h1 th:text="${character.name}"></h1>
+            <p>
+                Класс: <strong th:text="${character.characterClass}"></strong>,
+                уровень: <strong th:text="${character.level}"></strong>
+            </p>
+        </div>
+        <div class="actions">
+            <a class="button" th:href="@{|/characters/${character.id}/edit|}">Изменить</a>
+            <a class="button secondary" th:href="@{/characters}">К списку</a>
+            <a class="button secondary" th:href="@{/guilds}">Гильдии</a>
+        </div>
+    </div>
+
+    <div class="details-grid">
+        <section class="card">
+            <h2>Основные данные</h2>
+            <p><strong>ID:</strong> <span th:text="${character.id}"></span></p>
+            <p><strong>Здоровье:</strong> <span th:text="${character.health}"></span>/<span th:text="${character.maxHealth}"></span></p>
+            <p><strong>Базовый урон:</strong> <span th:text="${character.baseDamage}"></span></p>
+            <p><strong>Регенерация:</strong> <span th:text="${character.regenAmount}"></span> / <span th:text="${character.regenIntervalSec}"></span> сек</p>
+        </section>
+
+        <section class="card">
+            <h2>Гильдия</h2>
+            <p th:if="${character.guild != null}">
+                <a th:href="@{|/guilds/${character.guild.id}|}" th:text="${character.guild.name}"></a>
+            </p>
+            <p th:if="${character.guild == null}" class="muted">Не состоит в гильдии.</p>
+        </section>
+
+        <section class="card">
+            <h2>Классовые характеристики</h2>
+            <div th:if="${character.characterClass == 'Seeker'}">
+                <p><strong>Сила:</strong> <span th:text="${character.strength}"></span></p>
+                <p><strong>Ловкость:</strong> <span th:text="${character.agility}"></span></p>
+                <p><strong>Энергия:</strong> <span th:text="${character.energy}"></span></p>
+                <p><strong>Шанс уворота:</strong> <span th:text="${character.dodgeChance}"></span></p>
+                <p><strong>Скрытность:</strong> <span th:text="${character.isStealthed ? 'Да' : 'Нет'}"></span></p>
+                <p><strong>Секунд в скрытности:</strong> <span th:text="${character.stealthSeconds}"></span></p>
+                <div class="actions">
+                    <form th:action="@{|/characters/${character.id}/actions/useSpecial|}" method="post">
+                        <button type="submit">Use Special (Stealth)</button>
+                    </form>
+                    <form th:action="@{|/characters/${character.id}/actions/useAbility|}" method="post">
+                        <button type="submit">Use Ability</button>
+                    </form>
+                    <form th:action="@{|/characters/${character.id}/actions/tickOneSecond|}" method="post">
+                        <button type="submit">Tick +1s</button>
+                    </form>
+                    <form th:action="@{|/characters/${character.id}/actions/takeDamage|}" method="post">
+                        <button type="submit">Take Damage</button>
+                    </form>
+                    <form th:action="@{|/characters/${character.id}/actions/heal|}" method="post">
+                        <button type="submit" class="success">Heal</button>
+                    </form>
+                </div>
+            </div>
+            <div th:if="${character.characterClass == 'Templar'}">
+                <p><strong>Сила:</strong> <span th:text="${character.strength}"></span></p>
+                <p><strong>Ловкость:</strong> <span th:text="${character.agility}"></span></p>
+                <p><strong>Вера:</strong> <span th:text="${character.faith}"></span></p>
+                <p><strong>Шанс блока:</strong> <span th:text="${character.blockChance}"></span></p>
+                <p><strong>Броня:</strong> <span th:text="${character.armor}"></span></p>
+                <p><strong>Неуязвимость:</strong> <span th:text="${character.isImmobilized ? 'Да' : 'Нет'}"></span></p>
+                <p><strong>Тики купола:</strong> <span th:text="${character.aegisTicksRemaining}"></span></p>
+                <p><strong>Лечение за тик:</strong> <span th:text="${character.aegisHealAmount}"></span></p>
+                <div class="actions">
+                    <form th:action="@{|/characters/${character.id}/actions/useSpecial|}" method="post">
+                        <button type="submit">Use Special</button>
+                    </form>
+                    <form th:action="@{|/characters/${character.id}/actions/useAbility|}" method="post">
+                        <button type="submit">Use Ability (Divine Aegis)</button>
+                    </form>
+                    <form th:action="@{|/characters/${character.id}/actions/tickOneSecond|}" method="post">
+                        <button type="submit">Tick +1s</button>
+                    </form>
+                    <form th:action="@{|/characters/${character.id}/actions/takeDamage|}" method="post">
+                        <button type="submit">Take Damage</button>
+                    </form>
+                    <form th:action="@{|/characters/${character.id}/actions/heal|}" method="post">
+                        <button type="submit" class="success">Heal (+15)</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+</body>
+</html>
